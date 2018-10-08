@@ -46,20 +46,21 @@ main(int argc, char **argv){
 	  for(int i = 0; i< sets;i++){
 		  tagArray[i]=(unsigned int *)malloc(K * sizeof(unsigned int));
 	  }
-	  lruArray = (int **) malloc(K *sizeof(int *));
+	  lruArray = (int **) malloc(sets *sizeof(int *));
 	  for(int i=0; i< K;i++){
 		  lruArray=(int *)malloc(K *size(int *));
 	  }
 	  
 	  //instantiate lruarray
-	  for(int i=0;i<K;i++){
+	/*  for(int i=0;i<K;i++){
 		  int j=0;
 		lruArray[i][j]=-1;
-	  }
+	  }*/
 	  //initialize tagArray
 	  for(int i=0;i<sets;i++){
 		  for(int j=0;j<K;i++){
-			tagArray[i][j]=0;  
+			tagArray[i][j]=0; 
+			lruArray[i][j]=-1;			
 		  }
 	  }
 	  
@@ -78,14 +79,14 @@ main(int argc, char **argv){
 	int address;
 	//work on this code and need to understand 
 	while(fscanf(trace, "%x", &address) !=EOF){
-		int tag = maske & tagbits// figure out how to do this
+		int tag = mask & tagbits// figure out how to do this
 		int setLocation = whichSet(address, setBits, offsetBits);
-		int tagLocation = hitWay(tagArray[set], K, tag);
+		int tagLocation = hitWay(tagArray[setLocation], K, tag);
 	if(tagLocation>-1){
-		updateOnHit(tagArray[set], lruArray[set], K, tag);
+		updateOnHit(tagArray[setLocation], lruArray[setLocation], K, tagLocation);
 		hit++;
 	}else{
-		updateOnMiss(tagArray[set], lruArray[set], K, tag);
+		updateOnMiss(tagArray[setLocation], lruArray[setLocation], K, tagLocation);
 		miss++;
 	}
 	fclose(trace);
@@ -105,17 +106,52 @@ int offsetLength(int block_size){
 	return _log2(block_size);
 	
 }
-hitWay(int * tagSet, int ways, int tag){
-	
+hitWay(int * tagArray, int K, int tag){
+	for(int i=0;i<K;i++){
+		if(tagArray[i]==tag){
+			return i;
+		}
+	}
+	return -1; 
 	
 }
-updateOnHit(){
-	
+updateOnHit(int * tagArray, int * lruArray, int K, int tag){
+	int tagArray_index;
+	for(int i =0; i<K;i++){
+		if(tagArray[i]==tag){
+			tagArray_index=i;
+		}
+		if(lruArray[i]>-1){
+			lruArray[i]++;
+		}
+	}
+	lruArray[tagArray_index]=0;
 	
 }
-updateOnMiss(){
-	
-	
+updateOnMiss  int * tagArray, int * lruArray, int K, int tag){
+	int lruArray_index =0;
+	int lowest = lruArray[0];
+
+	for(int i =0;i<K;i++){
+	if(lruArray[i]==-1){
+		lruArray_index=i;
+		break;
+	}else if(lruArray[i]>-1 && lruArray[i]<lowest){
+			lowest = lruArray[i];
+			lruArray_index=i;			
+			}
+	}
+	/*for(int j =0;j<K;j++){
+		if(lruArray[j]>-1 && lruArray[j]<lowest)
+			lowest = lruArray[j];
+			
+	}*/
+	for(int j =0;j<K;j++){
+		if(lruArray[j]>-1 && lruArray[j]!=lowest)
+			lruArray[j]++;
+	}
+	tagArray[lruArray_index] = tag; 
+	lruArray[lruArray_index] = 0; 
 }
 
 int mylog2(int n) {

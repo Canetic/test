@@ -73,6 +73,12 @@ main(int argc, char **argv){
     mask <<= 8;
     mask |= 0xFF;
   }
+  
+  int whichSet(unsigned int address){
+	int mask = ~(0xFFFFFFFF << Cache.setIndexFieldLength); //generate mask for unwanted tag bits
+  	address = address >> Cache.blockOffsetFieldLength; //shift to eliminate offset bits
+  	return address & mask;
+}
 	  
 	int hit = 0;
 	int miss = 0;

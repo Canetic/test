@@ -31,8 +31,8 @@ main(int argc, char **argv){
 	int numOflines = C/L;
 	int sets=numOfLines/K;
 	int offsetBits = offsetLength(sets);
-	int indexLengthBits = setIndexLength(K);
-	int tagLengthBits = 32-offsetBits-indexLengthBits; 
+	int setBits = setIndexLength(K);
+	int tagLengthBits = 32-offsetBits-setBits; 
 	
 	
 	
@@ -66,12 +66,36 @@ main(int argc, char **argv){
 	  // Open the trace file
   FILE * trace;
   trace = fopen (file, "r");
+  
+	int mask = 0;
+    for (int i; i < L; i++) {
+    mask <<= 8;
+    mask |= 0xFF;
+  }
 	  
+	int hit = 0;
+	int miss = 0;
+	int address;
+	//work on this code and need to understand 
+	while(fscanf(trace, "%x", &address) !=EOF){
+		int tag = maske & tagbits// figure out how to do this
+		int setLocation = whichSet(address, setBits, offsetBits);
+		int tagLocation = hitWay(tagArray[set], K, tag);
+	if(tagLocation>-1){
+		updateOnHit(tagArray[set], lruArray[set], K, tag);
+		hit++;
+	}else{
+		updateOnMiss(tagArray[set], lruArray[set], K, tag);
+		miss++;
+	}
+	fclose(trace);
+	} 
+	float miss_rate = (float) miss/ ((float) (hit + miss));
 		
 }
-
-int whichSet(int setLocation){
-
+// have to review later 
+int whichSet(int address, int setBits, int offsetBits){
+	return (address >> setBits) & (~((~0) <<numSetBits));
 }
 
 int setIndexLength(set){
@@ -81,7 +105,7 @@ int offsetLength(int block_size){
 	return _log2(block_size);
 	
 }
-hitWay(){
+hitWay(int * tagSet, int ways, int tag){
 	
 	
 }
@@ -93,7 +117,7 @@ updateOnMiss(){
 	
 	
 }
-*/
+
 int mylog2(int n) {
   int c = -1;
   n -= 1;
@@ -102,4 +126,13 @@ int mylog2(int n) {
     n >>= 1;
   }
   return c;
+  /*//returns log base 2 of x, rounding up 
+//called by setIndexLenth() and offsetLength()
+int lg(int x){
+
+	int i;
+	for(i = 1; (1<<i) <= x; i++)
+		if(x == (1<<i))return i;
+	return i;
+	*/
 }

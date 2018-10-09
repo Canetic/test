@@ -1,4 +1,4 @@
-/*Karl Shao, WenHao, Hung*/
+/*Karl Shao, WenHao Jiang, Hung Nguyen*/
 
 #include <stdio.h>
 #include <math.h>
@@ -40,21 +40,31 @@ int main(int argc, char **argv){
 	// allocate memory for tagArray and lruArray
 	int i, j;
 	 unsigned int **tagArray = (unsigned int **) malloc(sets * sizeof(unsigned int *));
-	  for(i = 0; i< sets;i++){
+	  
+	  i=0;
+	  while(i< sets){
 		  tagArray[i]=(unsigned int *)malloc(K * sizeof(unsigned int));
+			i++;
 	  }
 	 int **lruArray = (int **) malloc(sets * sizeof(int *));
-	  for(i=0; i< sets;i++){
+		
+		i=0;
+	  while(i< sets){
 		  lruArray[i]=(int *)malloc(K * sizeof(int));
+			i++;
 	  }
 	  
 	 
 	  //initialize tagArray and lruArray
-	  for(i=0;i<sets;i++){
-		  for(j=0;j<K;j++){
+	  i=0;
+	  j=0;
+	  while(i<sets){
+		  while(j<K){
 			tagArray[i][j]=0; 
-			lruArray[i][j]=-1;			
+			lruArray[i][j]=-1;
+				j++;
 		  }
+		  i++;
 	  }
 	  assert(tagArray[0][0]==0);
 	  assert(lruArray[0][0]==-1);
@@ -87,36 +97,47 @@ int main(int argc, char **argv){
 		
 }
 
-// have to review later
-
+//change
 int tagBits(int address, int offsetBits, int setBits){ 
 	return address >> (setBits + offsetBits);
 }
+
+//change
 int whichSet(int setBits, int offsetBits, int address){
 	return (address >> offsetBits) & (~((~0) << setBits));
+	//int x = address << tagBits;
+	//return x >> (offsetBits + tagBits);
 }
 
+//change(?)
 int setIndexLength(int set){
 	return mylog2(set);
 }
+
+//change(?)
 int offsetLength(int offset){
 	return mylog2(offset);
 	
 }
+
+//change
 int hitWay(int * tagArray, int K, int tag){
-	int i;
-	for(i=0;i<K;i++){
+	int i = 0;
+	while(i<K){
 		if(tagArray[i]==tag){
 			return i;
 		}
+		i++;
 	}
 	return -1; 
 	
 }
+
+//change
 void updateOnHit( int K, int * tagArray, int * lruArray, int tag){
 	int tagArray_index;
-	int i;
-	for(i =0; i<K;i++){
+	int i = 0;
+	while(i < K){
 		if(tagArray[i]==tag){
 			tagArray_index=i;
 		}
@@ -124,14 +145,18 @@ void updateOnHit( int K, int * tagArray, int * lruArray, int tag){
 			lruArray[i]++;
 		}
 	}
+	i++;
 	lruArray[tagArray_index]=0;
-	
 }
+
+//change
 void updateOnMiss ( int K, int * tagArray, int * lruArray, int tag){
 	int lruArray_index =0;
 	int lowest = lruArray[0];
-	int i;
-	for(i =0;i<K;i++){
+	int i = 0;
+	int j = 0;
+	
+	while(i < K){
 	if(lruArray[i]==-1){
 		lruArray_index=i;
 		break;
@@ -139,23 +164,27 @@ void updateOnMiss ( int K, int * tagArray, int * lruArray, int tag){
 			lowest = lruArray[i];
 			lruArray_index=i;			
 			}
+	i++;
 	}
-	int j;
-	for(j =0;j<K;j++){
+	
+	while(j < K){
 		if(lruArray[j]>-1 && lruArray[j]!=lowest)
 			lruArray[j]++;
+	j++;
 	}
 	tagArray[lruArray_index] = tag; 
 	lruArray[lruArray_index] = 0; 
 }
 
+
+//change
 int mylog2(int x) {
-	int i;
-	for(i = 1; (1<<i) <= x; i++){
+	int i = 1;
+	while((1<<i) <= x){
 		if(x == (1<<i)){
 			return i;
 		}
+	i++;	
 	}
 	return i;
   }
- 

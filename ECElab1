@@ -13,10 +13,11 @@ int hitWay();
 void updateOnHit();
 void updateOnMiss();
 int mylog2();
-//int tagBits();
+int tagBits();
 
 
 int main(int argc, char **argv){
+	printf("hello");
 	int L, K, C;
 	char * file;// = (char *)malloc(sizeof(char));
 
@@ -25,8 +26,6 @@ int main(int argc, char **argv){
 	sscanf (argv[3], "%d", &C);
 	file = argv[4];
 
-	
-	
 	int sets=((C*1024)/L)/K;
 	
 	int offsetBits = offsetLength(sets);
@@ -39,21 +38,22 @@ int main(int argc, char **argv){
 	unsigned int **tagArray;
 	int **lruArray;
 	// allocate memory for tagArray and lruArray
+	int i, j;
 	  tagArray = (unsigned int **) malloc(sets * sizeof(unsigned int *));
-	  for(int i = 0; i< sets;i++){
+	  for(i = 0; i< sets;i++){
 		  tagArray[i]=(unsigned int *)malloc(K * sizeof(unsigned int));
 	  }
 	  lruArray = (int **) malloc(sets * sizeof(int *));
-	  for(int i=0; i< K;i++){
+	  for(i=0; i< sets;i++){
 		  lruArray[i]=(int *)malloc(K * sizeof(int));
 	  }
 	  
 	 
 	  //initialize tagArray
-	  for(int i=0;i<sets;i++){
-		  for(int j=0;j<K;i++){
-		  	lruArray[i][j]=-1;
-			tagArray[i][j]=0; 			
+	  for(i=0;i<sets;i++){
+		  for(j=0;j<K;i++){
+			tagArray[i][j]=0; 
+			lruArray[i][j]=-1;			
 		  }
 	  }
 	  
@@ -88,7 +88,7 @@ int main(int argc, char **argv){
 // have to review later
 
 int tagBits(int address, int offsetBits, int setBits){ 
-	return address>>(offsetBits+setBits)
+	return address>>(offsetBits+setBits);
 }
 int whichSet(int tag, int offsetBits, int address){
 	int x = address << tag;
@@ -103,7 +103,8 @@ int offsetLength(int block_size){
 	
 }
 int hitWay(int K, int * tagArray, int tag){
-	for(int i=0;i<K;i++){
+	int i;
+	for(i=0;i<K;i++){
 		if(tagArray[i]==tag){
 			return i;
 		}
@@ -113,7 +114,8 @@ int hitWay(int K, int * tagArray, int tag){
 }
 void updateOnHit( int K, int * tagArray, int * lruArray, int tag){
 	int tagArray_index;
-	for(int i =0; i<K;i++){
+	int i;
+	for(i =0; i<K;i++){
 		if(tagArray[i]==tag){
 			tagArray_index=i;
 		}
@@ -127,8 +129,8 @@ void updateOnHit( int K, int * tagArray, int * lruArray, int tag){
 void updateOnMiss ( int K, int * tagArray, int * lruArray, int tag){
 	int lruArray_index =0;
 	int lowest = lruArray[0];
-
-	for(int i =0;i<K;i++){
+	int i;
+	for(i =0;i<K;i++){
 	if(lruArray[i]==-1){
 		lruArray_index=i;
 		break;
@@ -137,8 +139,8 @@ void updateOnMiss ( int K, int * tagArray, int * lruArray, int tag){
 			lruArray_index=i;			
 			}
 	}
-	
-	for(int j =0;j<K;j++){
+	int j;
+	for(j =0;j<K;j++){
 		if(lruArray[j]>-1 && lruArray[j]!=lowest)
 			lruArray[j]++;
 	}

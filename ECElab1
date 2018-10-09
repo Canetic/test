@@ -74,12 +74,12 @@ int main(int argc, char **argv){
 		int tag = mask & tagbits;// figure out how to do this
 		int setLocation = whichSet(setBits, offsetBits, address);
 		int tagLocation = hitWay(K, tagArray[setLocation], tag);
-	if(tagLocation>-1){
-		updateOnHit(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
-		hit++;
-	}else{
+	if(tagLocation<0){
 		updateOnMiss(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
 		miss++;
+	}else{
+		updateOnHit(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
+		hit++;
 	}
 	fclose(trace);
 	} 

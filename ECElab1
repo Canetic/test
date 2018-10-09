@@ -51,7 +51,7 @@ int main(int argc, char **argv){
 	 
 	  //initialize tagArray
 	  for(i=0;i<sets;i++){
-		  for(j=0;j<K;i++){
+		  for(j=0;j<K;j++){
 			tagArray[i][j]=0; 
 			lruArray[i][j]=-1;			
 		  }
@@ -68,13 +68,13 @@ int main(int argc, char **argv){
 	//work on this code and need to understand 
 	while(fscanf(trace, "%x", &address) != EOF){
 		int tag = tagBits(address, offsetBits, setBits);
-		int setLocation = whichSet(tag, offsetBits, address);
-		int tagLocation = hitWay(K, tagArray[setLocation], tag);
+		int setLocation = whichSet(setBits, offsetBits, address);
+		int tagLocation = hitWay(tagArray[setLocation], K, tag);
 	if(tagLocation<0){
-		updateOnMiss(K, &tagArray[setLocation], &lruArray[setLocation], tagLocation);
+		updateOnMiss(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
 		miss++;
 	}else{
-		updateOnHit(K, &tagArray[setLocation], &lruArray[setLocation], tagLocation);
+		updateOnHit(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
 		hit++;
 	}
 	}
@@ -88,11 +88,12 @@ int main(int argc, char **argv){
 // have to review later
 
 int tagBits(int address, int offsetBits, int setBits){ 
-	return address>>(offsetBits+setBits);
+	return address >> (setBits + offsetBits);
 }
-int whichSet(int tag, int offsetBits, int address){
-	int x = address << tag;
-	return x>>(offsetBits+tag);
+int whichSet(int setBits, int offsetBits, int address){
+	return (address >> offsetBits) & (~((~0) << setBits));
+	//int x = address << tag;
+	//return x>>(offsetBits+tag);
 }
 
 int setIndexLength(int set){
@@ -102,7 +103,7 @@ int offsetLength(int block_size){
 	return mylog2(block_size);
 	
 }
-int hitWay(int K, int * tagArray, int tag){
+int hitWay(int * tagArray, int K, int tag){
 	int i;
 	for(i=0;i<K;i++){
 		if(tagArray[i]==tag){

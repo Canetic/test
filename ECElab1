@@ -52,8 +52,8 @@ int main(int argc, char **argv){
 	  //initialize tagArray
 	  for(int i=0;i<sets;i++){
 		  for(int j=0;j<K;i++){
-			tagArray[i][j]=0; 
-			lruArray[i][j]=-1;			
+		  	lruArray[i][j]=-1;
+			tagArray[i][j]=0; 			
 		  }
 	  }
 	  

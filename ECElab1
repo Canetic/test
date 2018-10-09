@@ -1,3 +1,5 @@
+/*Karl Shao, WenHao, Hung*/
+
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -17,9 +19,9 @@ int tagBits();
 
 
 int main(int argc, char **argv){
-	printf("hello");
+
 	int L, K, C;
-	char * file;// = (char *)malloc(sizeof(char));
+	char * file;
 
 	sscanf (argv[1], "%d", &K);
 	sscanf (argv[2], "%d", &L);
@@ -27,36 +29,35 @@ int main(int argc, char **argv){
 	file = argv[4];
 
 	int sets=((C*1024)/L)/K;
-	
 	int offsetBits = offsetLength(sets);
-	
 	int setBits = setIndexLength(K);
+	int tagLengthBits = 32-offsetBits-setBits;
+	assert(K*sets*L==C*1024);
+	assert(tagLengthBits+setBits+offsetBits==32);
+	assert(mylog2(4) == 2);
 	
-	int tagLengthBits = 32-offsetBits-setBits; 
 	
-	
-	unsigned int **tagArray;
-	int **lruArray;
 	// allocate memory for tagArray and lruArray
 	int i, j;
-	  tagArray = (unsigned int **) malloc(sets * sizeof(unsigned int *));
+	 unsigned int **tagArray = (unsigned int **) malloc(sets * sizeof(unsigned int *));
 	  for(i = 0; i< sets;i++){
 		  tagArray[i]=(unsigned int *)malloc(K * sizeof(unsigned int));
 	  }
-	  lruArray = (int **) malloc(sets * sizeof(int *));
+	 int **lruArray = (int **) malloc(sets * sizeof(int *));
 	  for(i=0; i< sets;i++){
 		  lruArray[i]=(int *)malloc(K * sizeof(int));
 	  }
 	  
 	 
-	  //initialize tagArray
+	  //initialize tagArray and lruArray
 	  for(i=0;i<sets;i++){
 		  for(j=0;j<K;j++){
 			tagArray[i][j]=0; 
 			lruArray[i][j]=-1;			
 		  }
 	  }
-	  
+	  assert(tagArray[0][0]==0);
+	  assert(lruArray[0][0]==-1);
 	  // Open the trace file
   FILE * trace;
   trace = fopen (file, "r");
@@ -70,6 +71,7 @@ int main(int argc, char **argv){
 		int tag = tagBits(address, offsetBits, setBits);
 		int setLocation = whichSet(setBits, offsetBits, address);
 		int tagLocation = hitWay(tagArray[setLocation], K, tag);
+		assert(tagLocation>=-1);
 	if(tagLocation<0){
 		updateOnMiss(K, tagArray[setLocation], lruArray[setLocation], tagLocation);
 		miss++;
@@ -92,15 +94,13 @@ int tagBits(int address, int offsetBits, int setBits){
 }
 int whichSet(int setBits, int offsetBits, int address){
 	return (address >> offsetBits) & (~((~0) << setBits));
-	//int x = address << tag;
-	//return x>>(offsetBits+tag);
 }
 
 int setIndexLength(int set){
 	return mylog2(set);
 }
-int offsetLength(int block_size){
-	return mylog2(block_size);
+int offsetLength(int offset){
+	return mylog2(offset);
 	
 }
 int hitWay(int * tagArray, int K, int tag){
@@ -159,13 +159,3 @@ int mylog2(int x) {
 	return i;
   }
  
-  /*//returns log base 2 of x, rounding up 
-//called by setIndexLenth() and offsetLength()
-int lg(int x){
-int c = -1;
-  n -= 1;
-  while (n > 0) {
-    ++c;
-    n >>= 1;
-	
-	*/
